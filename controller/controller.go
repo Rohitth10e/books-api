@@ -51,3 +51,41 @@ func AddBook(c *gin.Context) {
 		"book":    newBook,
 	})
 }
+
+func UpdateBook(c *gin.Context) {
+	var update_book models.Book
+	id := c.Param("id")
+
+	if err := c.BindJSON(&update_book); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	for i, book := range books {
+		if id == book.ID {
+			update_book.ID = id
+			books[i] = update_book
+			c.JSON(http.StatusAccepted, gin.H{
+				"message":      "success",
+				"updated-book": update_book,
+			})
+			return
+		}
+	}
+}
+
+func DeleteBook(c *gin.Context) {
+	id := c.Param("id")
+
+	for i, book := range books {
+		if id == book.ID {
+			books = append(books[:i], books[i+1:]...)
+			c.JSON(http.StatusAccepted, gin.H{
+				"message": "success",
+			})
+			return
+		}
+	}
+}
